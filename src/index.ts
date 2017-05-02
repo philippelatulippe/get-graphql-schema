@@ -17,6 +17,7 @@ const usage = `  Usage: get-graphql-schema ENDPOINT_URL > schema.graphql
   Options:
     --json, -j      Output in JSON format (based on introspection query)
     --version, -v   Print version of get-graphql-schema
+    --auth, -a      Set the "Authentication" HTTP header
 `
 
 async function main() {
@@ -34,12 +35,21 @@ async function main() {
 
   const endpoint = argv._[0]
 
+  var headers = {
+      'Content-Type': 'application/graphql',
+  }
+
+  if (argv['auth']) {
+    headers["Authentication"] = argv['auth']
+  }
+  if (argv['a']) {
+    headers["Authentication"] = argv['a']
+  }
+  
   const response = await fetch(endpoint, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ query: introspectionQuery }),
+    headers: headers,
+    body: introspectionQuery,
   })
 
   const { data, errors } = await response.json()
